@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 1 ]; then
-  echo "generate_ids.sh taxa.txt" >&2
+if [ "$#" -ne 2 ]; then
+  echo "generate_ids.sh taxa.txt out.txt" >&2
   exit 1
 fi
 
@@ -16,4 +16,4 @@ cypher-shell <<EOF
 match (id:GlobalUniqueId) set id.count=id.count+$add;
 EOF
 
-awk -F'\t' -v OFS='\t' -v count="$count" 'NR==1{print $0,"generated_auto_id"}NR>1{print $0,count+NR}' "$1"
+awk -F'\t' -v OFS='\t' -v count="$count" 'NR==1{print $0,"generated_auto_id"}NR>1{print $0,count+NR}' "$1" >"$2"
