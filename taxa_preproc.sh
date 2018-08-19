@@ -9,4 +9,4 @@ if [ "$#" -ne 5 ]; then
 fi
 
 tmpfile=$(mktemp)
-join -t$'\t' -j1 -v2 <(tail -n+2 "$1"|awk -F'\t' "{print \$$2}"|sort) <(tail -n+2 "$1"|awk -F'\t' -v OFS='\t' "BEGIN{a[$4]=a[$5]=\"placeholder\"} \$$3!=\"\"{a[$2]=\$$3; o=a[1]; for(i=2;i<=NF;i++){o=o OFS a[i]} print o}"|sort -t$'\t' -k1b,1)|cat "$1" -|sed 's/"/\\"/g' >"$tmpfile" && mv "$tmpfile" "$1"
+join -t$'\t' -j1 -v2 <(tail -n+2 "$1"|awk -F'\t' "{print \$$2}"|sort) <(tail -n+2 "$1"|awk -F'\t' -v OFS='\t' "BEGIN{a[$4]=a[$5]=\"placeholder\"} \$$3!=\"\"{a[$2]=\$$3; o=a[1]; for(i=2;i<=NF;i++){o=o OFS a[i]} print o}"|sort -t$'\t' -k1b,1 -u)|cat "$1" -|sed 's/"/\\"/g' >"$tmpfile" && mv "$tmpfile" "$1"
