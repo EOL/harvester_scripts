@@ -18,3 +18,4 @@ EOF
 
 tmpfile=$(mktemp)
 awk -F'\t' -v OFS='\t' -v count="$count" 'NR==1{print $0,"generated_auto_id"}NR>1{print $0,count+NR-1}' "$1" >"$tmpfile" && mv "$tmpfile" "$1"
+chmod 777 "$1"
