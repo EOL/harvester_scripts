@@ -16,6 +16,7 @@ FOREACH(test IN CASE WHEN line [$7] IS NULL THEN [1] ELSE [] END |
 	)
 	FOREACH(test IN CASE WHEN line [$9] IS NOT NULL THEN [1] ELSE [] END |
 		create (n:GNode:Node:Root:Has_Page {node_id: line[$3], resource_id: $2, generated_auto_id: toInt(line[$6]), scientific_name: line[$4], rank: line[$5], page_id: toInt(line[$9]), created_at: timestamp(), updated_at: timestamp()})
+		match (n:GlobalUniqueId) where n.page_id < toInt(line[$9]) set n.page_id=toInt(line[$9])
 	)
 )
 FOREACH(test IN CASE WHEN line [$7] IS NOT NULL THEN [1] ELSE [] END | 
@@ -24,6 +25,7 @@ FOREACH(test IN CASE WHEN line [$7] IS NOT NULL THEN [1] ELSE [] END |
 	)
 	FOREACH(test IN CASE WHEN line [$9] IS NOT NULL THEN [1] ELSE [] END |
 		create (n:GNode:Node:Has_Page {node_id: line[$3], resource_id: $2, generated_auto_id: toInt(line[$6]), scientific_name: line[$4], rank: line[$5], page_id: toInt(line[$9]), created_at: timestamp(), updated_at: timestamp()})
+		match (n:GlobalUniqueId) where n.page_id < toInt(line[$9]) set n.page_id=toInt(line[$9])
 	)
 );
 EOF
