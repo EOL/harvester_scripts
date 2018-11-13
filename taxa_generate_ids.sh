@@ -35,7 +35,7 @@ hasHeader=$6
 awk -F$7 -v OFS=$7 -v count="$count" -v isAccepted="" -v acceptedParent="" -v acceptedNameUsageIdCol=$acceptedNameUsageIdCol -v  taxStatusCol=$taxStatusCol -v parentCol=$parentCol -v nodeIdCol=$nodeIdCol -v hasHeader=$hasHeader  'BEGIN{ split("accepted_accepted name_preffered_preffered name_provisionally accepted_provisionally accepted name_valid_valid name",parts,"_"); for (i in parts) vals[parts[i]]=""}
 {
     if(NR==1 && hasHeader=="true"){
-    	print $0,"generated_auto_id","syn","accepted parent"
+    	print $0,"generated_auto_id","is accepted","accepted parent"
     }
     else{
     	if(acceptedNameUsageIdCol>"-1") {
