@@ -47,9 +47,44 @@ FOREACH(test IN CASE WHEN line [$7] IS NOT NULL AND line [${10}]="1" THEN [1] EL
 EOF
 fi
 else
+if [ "$9" != "-1" ]; then
 cypher-shell <<EOF
 using periodic commit 10000
-load csv from 'file:///$1' as line fieldterminator '\t' 
-create (n:GNode:Node {node_id: line[$3], resource_id: $2, generated_auto_id: toInt(line[$6]), scientific_name: line[$4], rank: line[$5], created_at: timestamp(), updated_at: timestamp()});
+load csv from 'file:///$1' as line fieldterminator '\t' with line
+OPTIONAL match (n:GlobalUniqueId) where n.page_id < toInt(line[$9]) set n.page_id=toInt(line[$9])
+FOREACH(test IN CASE WHEN line [${10}]="0" and line[${11}]>"" THEN [1] ELSE [] END |
+	create (n:GNode:Synonym {node_id: line[$3], resource_id: $2, generated_auto_id: toInt(line[$6]), scientific_name: line[$4], rank: line[$5], created_at: timestamp(), updated_at: timestamp()})
+)
+FOREACH(test IN CASE WHEN line [$7] IS NULL AND line [${10}]="1" THEN [1] ELSE [] END | 
+	FOREACH(test IN CASE WHEN line [$9] IS NULL THEN [1] ELSE [] END |
+		create (n:GNode:Node:Root {node_id: line[$3], resource_id: $2, generated_auto_id: toInt(line[$6]), scientific_name: line[$4], rank: line[$5], created_at: timestamp(), updated_at: timestamp()})
+	)
+	FOREACH(test IN CASE WHEN line [$9] IS NOT NULL THEN [1] ELSE [] END |
+		create (n:GNode:Node:Root:Has_Page {node_id: line[$3], resource_id: $2, generated_auto_id: toInt(line[$6]), scientific_name: line[$4], rank: line[$5], page_id: toInt(line[$9]), created_at: timestamp(), updated_at: timestamp()})
+	)
+)
+FOREACH(test IN CASE WHEN line [$7] IS NOT NULL AND line [${10}]="1" THEN [1] ELSE [] END | 
+	FOREACH(test IN CASE WHEN line [$9] IS NULL THEN [1] ELSE [] END |
+		create (n:GNode:Node {node_id: line[$3], resource_id: $2, generated_auto_id: toInt(line[$6]), scientific_name: line[$4], rank: line[$5], created_at: timestamp(), updated_at: timestamp()})
+	)
+	FOREACH(test IN CASE WHEN line [$9] IS NOT NULL THEN [1] ELSE [] END |
+		create (n:GNode:Node:Has_Page {node_id: line[$3], resource_id: $2, generated_auto_id: toInt(line[$6]), scientific_name: line[$4], rank: line[$5], page_id: toInt(line[$9]), created_at: timestamp(), updated_at: timestamp()})
+	)
+);
 EOF
+else
+cypher-shell <<EOF
+using periodic commit 10000
+load csv from 'file:///$1' as line fieldterminator '\t' with line
+FOREACH(test IN CASE WHEN line [${10}]="0" and line[${11}]>"" THEN [1] ELSE [] END |
+	create (n:GNode:Synonym {node_id: line[$3], resource_id: $2, generated_auto_id: toInt(line[$6]), scientific_name: line[$4], rank: line[$5], created_at: timestamp(), updated_at: timestamp()})
+)
+FOREACH(test IN CASE WHEN line [$7] IS NULL AND line [${10}]="1" THEN [1] ELSE [] END | 
+	create (n:GNode:Node:Root {node_id: line[$3], resource_id: $2, generated_auto_id: toInt(line[$6]), scientific_name: line[$4], rank: line[$5], created_at: timestamp(), updated_at: timestamp()})
+)
+FOREACH(test IN CASE WHEN line [$7] IS NOT NULL AND line [${10}]="1" THEN [1] ELSE [] END | 
+	create (n:GNode:Node {node_id: line[$3], resource_id: $2, generated_auto_id: toInt(line[$6]), scientific_name: line[$4], rank: line[$5], created_at: timestamp(), updated_at: timestamp()})
+);
+EOF
+fi
 fi
